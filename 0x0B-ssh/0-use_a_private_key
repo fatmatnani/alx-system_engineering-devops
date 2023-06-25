@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Define the server address
 server_address="34.232.70.21"
@@ -10,5 +10,4 @@ username="ubuntu"
 private_key_path="~/.ssh/school"
 
 # Use ssh to connect to the server
-ssh -i "$private_key_path" "$username@$server_address"
-
+ssh -i $private_key_path $username@$server_address
