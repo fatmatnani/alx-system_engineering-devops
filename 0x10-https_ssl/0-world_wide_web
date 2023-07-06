@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# This script displays information about subdomains.
+
+# Get the domain name and subdomain from the arguments.
+domain="$1"
+subdomain="$2"
+
+# Set the subdomains variable to an empty string.
+subdomains=""
+
+# Check if the subdomain argument was provided.
+if [ -z "$subdomain" ]; then
+  # If not, list all the subdomains.
+  subdomains="www lb-01 web-01 web-02"
+else
+  # If yes, only list the specified subdomain.
+  subdomains="$subdomain"
+fi
+
+# Loop through the subdomains and display information about them.
+for subdomain in $subdomains; do
+  # Get the record type and destination for the subdomain.
+  record_type=$(dig "$domain.$subdomain" | awk -F' ' '{print $4}')
+  destination=$(dig "$domain.$subdomain" | awk -F' ' '{print $5}')
+
+  # Display the information about the subdomain.
+  echo "The subdomain $subdomain is a $record_type record and points to $destination"
+done
+
