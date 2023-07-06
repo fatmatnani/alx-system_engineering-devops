@@ -1,30 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# This script displays information about subdomains.
+# Configure my domain zone:
+# www --> 196785-lb-01 35.153.98.27
+# web-01 --> 196785-web-01 34.232.70.21
+# web-02 --> 196785-web-02 52.3.246.69
 
-# Get the domain name and subdomain from the arguments.
-domain="$1"
-subdomain="$2"
+subdomains_all=( "www" "lb-01" "web-01" "web-02" )
 
-# Set the subdomains variable to an empty string.
-subdomains=""
+runDig () {
+    subdomain=$1
+    domain=$2
 
-# Check if the subdomain argument was provided.
-if [ -z "$subdomain" ]; then
-  # If not, list all the subdomains.
-  subdomains="www lb-01 web-01 web-02"
-else
-  # If yes, only list the specified subdomain.
-  subdomains="$subdomain"
+    dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk -v s="$subdomain" '{print "The subdomain "$s" is a "$4" record and points to "$5"'}
+}
+
+if [ $# -eq 1 ]; then
+    domain="$1"
+    for i in "${subdomains_all[@]}"
+    do
+        runDig "$i" "$domain"
+    done
+elif [ $# -eq 2 ]; then
+    domain="$1"
+    subdomain="$2"
+    runDig "$subdomain" "$domain"
 fi
-
-# Loop through the subdomains and display information about them.
-for subdomain in $subdomains; do
-  # Get the record type and destination for the subdomain.
-  record_type=$(dig "$domain.$subdomain" | awk -F' ' '{print $4}')
-  destination=$(dig "$domain.$subdomain" | awk -F' ' '{print $5}')
-
-  # Display the information about the subdomain.
-  echo "The subdomain $subdomain is a $record_type record and points to $destination"
-done
 
