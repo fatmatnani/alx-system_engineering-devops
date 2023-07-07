@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
-
-
 # Configure my domain zone:
 # www --> 196785-lb-01 35.153.98.27
 # web-01 --> 196785-web-01 34.232.70.21
 # web-02 --> 196785-web-02 52.3.246.69
-# This script displays information about subdomains of a domain
-# Function to retrieve DNS record information
-get_dns_record() {
-  local domain=$1
-  local subdomain=$2
-  dig_output=$(dig "$subdomain.$domain" | awk '/ANSWER SECTION/ { getline; print }')
-  record_type=$(echo "$dig_output" | awk '{ print $4 }')
-  destination=$(echo "$dig_output" | awk '{ print $5 }')
-  echo "The subdomain $subdomain is a $record_type record and points to $destination"
+
+subdomains_all=( "www" "lb-01" "web-01" "web-02" )
+
+runDig () {
+    subdomain=$1
+    domain=$2
+
+    dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk -v s="$subdomain" 'BEGIN { FS = " " } ; { print "The subdomain " s " is a " $4 " record and points to " $5 }'
 }
-# Check if subdomain argument is provided
-if [[ -n $2 ]]; then
-  get_dns_record "$1" "$2"
-else
-  default_subdomains=("www" "lb-01" "web-01" "web-02")
-  for subdomain in "${default_subdomains[@]}"; do
-    get_dns_record "$1" "$subdomain"
-  done
+
+if [ $# -eq 1 ]; then
+    domain="$1"
+    for i in "${subdomains_all[@]}"
+    do
+	runDig "$i" "$domain"
+    done
+elif [ $# -eq 2 ]; then
+    domain="$1"
+    subdomain="$2"
+    runDig "$subdomain" "$domain"
 fi
