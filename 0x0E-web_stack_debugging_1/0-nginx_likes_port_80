@@ -1,15 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# what’s keeping your Ubuntu container’s Nginx installation from listening on port 8?
+# configures nginx to run and listen to port 80
 
-# Install Nginx
-apt-get update && apt-get install -y nginx
-
-# Check if Nginx is listening on port 80
-netstat -tulpn | grep 80
-
-# If Nginx is not listening on port 80, start it
-if ! [ -n "$(netstat -tulpn | grep 80)" ]; then
-  service nginx start
-fi
-
-# Check again if Nginx is listening on port 80
-netstat -tulpn | grep 80
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+service nginx restart
