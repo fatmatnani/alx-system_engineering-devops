@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Configures a web server to run Nginx as the nginx user listening on port 8080.
+echo "user nginx;" > /etc/nginx/conf.d/user.conf
+echo "listen 8080 default_server;" > /etc/nginx/conf.d/listen.conf
+service nginx restart
